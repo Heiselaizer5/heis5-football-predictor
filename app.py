@@ -154,10 +154,10 @@ if df_league is not None:
         
         m_col1, m_col2, m_col3, m_col4 = st.columns(4)
         with m_col1:
-            st.markdown(f'<div class="metric-box"><p style="margin:0; font-size:14px; color:#6B7280; font-weight:bold;">🏆 PREDICTED SCORE</p><p style="margin:5px 0 0 0; font-size:28px; color:#1E3A8A; font-weight:bold;">{predicted_score}</p></div>', unsafe_allow_html=True)
+            st.markdown('<div class="metric-box"><p style="margin:0; font-size:14px; color:#6B7280; font-weight:bold;">🏆 PREDICTED SCORE</p><p style="margin:5px 0 0 0; font-size:28px; color:#1E3A8A; font-weight:bold;">' + str(predicted_score) + '</p></div>', unsafe_allow_html=True)
         with m_col2:
-            st.markdown(f'<div class="metric-box"><p style="margin:0; font-size:14px; color:#6B7280; font-weight:bold;">⚽ TOTAL GOALS</p><p style="margin:5px 0 0 0; font-size:28px; color:#10B981; font-weight:bold;">{exp_home_goals + exp_away_goals:.2f}</p></div>', unsafe_allow_html=True)
+            st.markdown('<div class="metric-box"><p style="margin:0; font-size:14px; color:#6B7280; font-weight:bold;">⚽ TOTAL GOALS</p><p style="margin:5px 0 0 0; font-size:28px; color:#10B981; font-weight:bold;">' + f"{exp_home_goals + exp_away_goals:.2f}" + '</p></div>', unsafe_allow_html=True)
         with m_col3:
-            st.markdown(f'<div class="metric-box"><p style="margin:0; font-size:14px; color:#6B7280; font-weight:bold;">🚩 EXPECTED CORNERS</p><p style="margin:5px 0 0 0; font-size:28px; color:#F59E0B; font-weight:bold;">{exp_total_corners:.1f}</p></div>', unsafe_allow_html=True)
+            st.markdown('<div class="metric-box"><p style="margin:0; font-size:14px; color:#6B7280; font-weight:bold;">🚩 EXPECTED CORNERS</p><p style="margin:5px 0 0 0; font-size:28px; color:#F59E0B; font-weight:bold;">' + f"{exp_total_corners:.1f}" + '</p></div>', unsafe_allow_html=True)
         with m_col4:
-            st.markdown(f'<div class="metric-box"><p style="margin:0; font-size:14px; color:#6B7280; font-weight:bold;">🟨 EXPECTED CARDS</p><p style="margin:5px 0 0 0; font-size:28px; color:#EF4444; font-weight:bold;">{exp_total_cards:.1f}</p></div>', unsafe_allow_html=True)
+            st.markdown('<div class="metric-box"><p style="margin:0; font-size:14px; color:#6B7280; font-weight:bold;">🟨 EXPECTED CARDS</p><p style="margin:5px 0 0 0; font-size:28px; color:#EF4444; font-weight:bold;">' + f"{exp_total_cards:.1f}" + '</p></div>', unsafe_allow_html=True)
