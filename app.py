@@ -39,7 +39,7 @@ LEAGUE_MAP = {
 }
 
 # Your API Key - input it directly here or use Streamlit secrets
-API_KEY = "147de3e3791572d572a311d054e30138" 
+API_KEY = "90f1333a79ec156e426803bf6c997d23" 
 
 # -------------------------------------------------------------------------
 # 3. LIVE DATA FETCHING & DATAFRAME GENERATION
