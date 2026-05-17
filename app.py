@@ -2,6 +2,7 @@ import streamlit as st
 import pandas as pd
 import numpy as np
 import requests
+import math
 
 # -------------------------------------------------------------------------
 # 1. PAGE CONFIGURATION & STYLING
@@ -140,11 +141,10 @@ if df_league is not None:
         
         # --- SCORE MATRIX ---
         max_g = 6
-        home_poisson = [np.exp(-exp_home_goals) * (exp_home_goals**i) / np.math.factorial(i) for i in range(max_g)]
-        away_poisson = [np.exp(-exp_away_goals) * (exp_away_goals**j) / np.math.factorial(j) for j in range(max_g)]
+        # Changed np.math.factorial to math.factorial below:
+        home_poisson = [np.exp(-exp_home_goals) * (exp_home_goals**i) / math.factorial(i) for i in range(max_g)]
+        away_poisson = [np.exp(-exp_away_goals) * (exp_away_goals**j) / math.factorial(j) for j in range(max_g)]
         score_matrix = np.outer(home_poisson, away_poisson)
-        best_score_idx = np.unravel_index(np.argmax(score_matrix), score_matrix.shape)
-        predicted_score = f"{best_score_idx[0]} - {best_score_idx[1]}"
         
         # -------------------------------------------------------------------------
         # 6. GRAPHICAL DASHBOARD DISPLAY
