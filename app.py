@@ -9,7 +9,7 @@ import math
 # -------------------------------------------------------------------------
 st.set_page_config(page_title="HEIS5 Multi-Source Predictor", page_icon="⚽", layout="wide")
 
-st.title("⚽ HEIS5 Live & Tournament Match Predictor")
+st.title("⚽ Welcome to HEIS5 Match Predictor")
 
 # -------------------------------------------------------------------------
 # 2. COMPETITION REGISTRY MAPPING (Hybrid Setup)
@@ -30,7 +30,7 @@ LEAGUE_MAP = {
 }
 
 # 🛠️ Paste your Football-Data.org API token here inside the quotes
-API_TOKEN = "YOUR_NEW_FOOTBALL_DATA_TOKEN"
+API_TOKEN = "d7bf2e7e47344436b3571ff11c6639c6"
 
 # -------------------------------------------------------------------------
 # 3. HYBRID DATA LOADING SYSTEM
@@ -46,7 +46,7 @@ def load_competition_data(config):
             return None
             
     elif config["type"] == "api":
-        if API_TOKEN == "YOUR_NEW_FOOTBALL_DATA_TOKEN" or not API_TOKEN:
+        if API_TOKEN == "d7bf2e7e47344436b3571ff11c6639c6" or not API_TOKEN:
             st.warning("⚠️ Please insert your API Token to access live leagues.")
             return None
             
