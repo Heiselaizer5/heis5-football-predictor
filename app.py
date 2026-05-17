@@ -5,27 +5,18 @@ import requests
 import math
 
 # -------------------------------------------------------------------------
-# 1. PAGE CONFIGURATION & STYLING
+# 1. PAGE CONFIGURATION
 # -------------------------------------------------------------------------
 st.set_page_config(page_title="HEIS5 Multi-Source Predictor", page_icon="⚽", layout="wide")
 
-st.markdown("""
-    <style>
-    .main-header { font-size: 36px; font-weight: bold; color: #1E3A8A; text-align: center; margin-bottom: 20px; }
-    .section-header { font-size: 22px; font-weight: bold; color: #1F2937; margin-top: 15px; margin-bottom: 15px; }
-    .metric-box { padding: 15px; background-color: #F3F4F6; border-radius: 8px; text-align: center; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
-    .vs-text { font-size: 28px; font-weight: bold; text-align: center; margin-top: 35px; color: #4B5563; }
-    </style>
-""", unsafe_allow_html=True)
-
-st.markdown('<div class="main-header">⚽ HEIS5 Live & Tournament Match Predictor</div>', unsafe_allow_html=True)
+st.title("⚽ HEIS5 Live & Tournament Match Predictor")
 
 # -------------------------------------------------------------------------
 # 2. COMPETITION REGISTRY MAPPING (Hybrid Setup)
 # -------------------------------------------------------------------------
 LEAGUE_MAP = {
     # Live API Competitions (Football-Data.org codes)
-    "English Premier League 🏴&zwj;󠁢󠁥󠁮󠁧󠁿": {"type": "api", "code": "PL"},
+    "English Premier League 🏴󠁧󠁢󠁥󠁮󠁧󠁿": {"type": "api", "code": "PL"},
     "Spanish La Liga 🇪🇸": {"type": "api", "code": "PD"},
     "German Bundesliga 🇩🇪": {"type": "api", "code": "BL1"},
     "French Ligue 1 🇫🇷": {"type": "api", "code": "FL1"},
@@ -39,7 +30,7 @@ LEAGUE_MAP = {
 }
 
 # 🛠️ Paste your Football-Data.org API token here inside the quotes
-API_TOKEN = "d7bf2e7e47344436b3571ff11c6639c6"
+API_TOKEN = "YOUR_NEW_FOOTBALL_DATA_TOKEN"
 
 # -------------------------------------------------------------------------
 # 3. HYBRID DATA LOADING SYSTEM
@@ -48,7 +39,6 @@ API_TOKEN = "d7bf2e7e47344436b3571ff11c6639c6"
 def load_competition_data(config):
     if config["type"] == "csv":
         try:
-            # Reads data directly from the local CSV file in your repo
             df = pd.read_csv(config["file"])
             return df
         except Exception as e:
@@ -103,11 +93,9 @@ df_league = load_competition_data(config)
 if df_league is not None:
     team_list = sorted(df_league['team_name'].unique())
     
-    col1, col_vs, col2 = st.columns([4, 1, 4])
+    col1, col2 = st.columns(2)
     with col1:
         home_team = st.selectbox("🏠 Home Team", team_list, index=0)
-    with col_vs:
-        st.markdown('<div class="vs-text">VS</div>', unsafe_allow_html=True)
     with col2:
         default_away_idx = min(1, len(team_list) - 1)
         away_team = st.selectbox("🚀 Away Team", team_list, index=default_away_idx)
@@ -141,13 +129,14 @@ if df_league is not None:
         
         # --- SCORE MATRIX ---
         max_g = 6
-        # Changed np.math.factorial to math.factorial below:
         home_poisson = [np.exp(-exp_home_goals) * (exp_home_goals**i) / math.factorial(i) for i in range(max_g)]
         away_poisson = [np.exp(-exp_away_goals) * (exp_away_goals**j) / math.factorial(j) for j in range(max_g)]
         score_matrix = np.outer(home_poisson, away_poisson)
+        best_score_idx = np.unravel_index(np.argmax(score_matrix), score_matrix.shape)
+        predicted_score = f"{best_score_idx[0]} - {best_score_idx[1]}"
         
-       # -------------------------------------------------------------------------
-        # 6. GRAPHICAL DASHBOARD DISPLAY (Using Native Streamlit Metrics)
+        # -------------------------------------------------------------------------
+        # 6. GRAPHICAL DASHBOARD DISPLAY (Native Metrics Engine)
         # -------------------------------------------------------------------------
         st.markdown("---")
         st.subheader("📊 Analytical Projections Matrix")
