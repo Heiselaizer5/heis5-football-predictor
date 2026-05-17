@@ -46,7 +46,7 @@ def load_competition_data(config):
             return None
             
     elif config["type"] == "api":
-        if API_TOKEN == "d7bf2e7e47344436b3571ff11c6639c6" or not API_TOKEN:
+        if API_TOKEN == "YOUR_NEW_FOOTBALL_DATA_TOKEN" or not API_TOKEN:
             st.warning("⚠️ Please insert your API Token to access live leagues.")
             return None
             
