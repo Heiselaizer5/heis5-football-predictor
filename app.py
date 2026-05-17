@@ -9,7 +9,7 @@ import math
 # -------------------------------------------------------------------------
 st.set_page_config(page_title="HEIS5 Multi-Source Predictor", page_icon="⚽", layout="wide")
 
-st.title("⚽ Welcome to HEIS5 Match Predictor")
+st.title("⚽ HEIS5 Live & Tournament Match Predictor")
 
 # -------------------------------------------------------------------------
 # 2. COMPETITION REGISTRY MAPPING (Hybrid Setup)
@@ -64,7 +64,6 @@ def load_competition_data(config):
             
             team_data = []
             for row in standings:
-                # Force integers and safeguard zero matches to prevent division errors
                 played = int(row['playedGames'])
                 played = played if played > 0 else 1
                 
@@ -83,6 +82,7 @@ def load_competition_data(config):
         except Exception as e:
             st.error(f"❌ Server Connection or Data Parsing Error: {str(e)}")
             return None
+
 # -------------------------------------------------------------------------
 # 4. SIDEBAR CONTROL PANEL
 # -------------------------------------------------------------------------
@@ -119,36 +119,98 @@ if df_league is not None:
         
         exp_home_goals = (home_att * (away_def / (avg_goals_scored if avg_goals_scored > 0 else 1))) * 1.10
         exp_away_goals = away_att * (home_def / (avg_goals_scored if avg_goals_scored > 0 else 1))
+        total_exp_goals = exp_home_goals + exp_away_goals
         
-        # --- CORNERS & CARDS PROJECTIONS ---
+        # --- CORNERS PROJECTIONS ---
         home_corners_avg = home_stats['corners_won'] / home_stats['matches_played']
         away_corners_avg = away_stats['corners_won'] / away_stats['matches_played']
         exp_total_corners = home_corners_avg + away_corners_avg
         
+        # --- CARDS PROJECTIONS ---
         home_cards_avg = home_stats['cards_received'] / home_stats['matches_played']
         away_cards_avg = away_stats['cards_received'] / away_stats['matches_played']
         exp_total_cards = home_cards_avg + away_cards_avg
         
-        # --- SCORE MATRIX ---
+        # --- SCORE MATRIX, BTTS, & OVER/UNDER MATH ---
         max_g = 6
         home_poisson = [np.exp(-exp_home_goals) * (exp_home_goals**i) / math.factorial(i) for i in range(max_g)]
         away_poisson = [np.exp(-exp_away_goals) * (exp_away_goals**j) / math.factorial(j) for j in range(max_g)]
         score_matrix = np.outer(home_poisson, away_poisson)
+        
         best_score_idx = np.unravel_index(np.argmax(score_matrix), score_matrix.shape)
         predicted_score = f"{best_score_idx[0]} - {best_score_idx[1]}"
         
+        # BTTS Logic
+        btts_prob = 0.0
+        for i in range(1, max_g):
+            for j in range(1, max_g):
+                btts_prob += score_matrix[i, j]
+        btts_status = "YES" if btts_prob >= 0.50 else "NO"
+        
+        # Over / Under Logic calculation across the whole matrix
+        prob_under_1_5 = 0.0
+        prob_under_2_5 = 0.0
+        prob_under_3_5 = 0.0
+        
+        for i in range(max_g):
+            for j in range(max_g):
+                total_goals = i + j
+                if total_goals < 1.5:
+                    prob_under_1_5 += score_matrix[i, j]
+                if total_goals < 2.5:
+                    prob_under_2_5 += score_matrix[i, j]
+                if total_goals < 3.5:
+                    prob_under_3_5 += score_matrix[i, j]
+                    
+        prob_over_1_5 = 1.0 - prob_under_1_5
+        prob_over_2_5 = 1.0 - prob_under_2_5
+        prob_over_3_5 = 1.0 - prob_under_3_5
+
+        # Determine best fit main market choice for the metric indicator box
+        if total_exp_goals >= 2.5:
+            main_ou_display = f"OVER 2.5 ({prob_over_2_5*100:.1f}%)"
+        else:
+            main_ou_display = f"UNDER 2.5 ({prob_under_2_5*100:.1f}%)"
+
         # -------------------------------------------------------------------------
-        # 6. GRAPHICAL DASHBOARD DISPLAY (Native Metrics Engine)
+        # 6. GRAPHICAL DASHBOARD DISPLAY
         # -------------------------------------------------------------------------
         st.markdown("---")
         st.subheader("📊 Analytical Projections Matrix")
         
-        m_col1, m_col2, m_col3, m_col4 = st.columns(4)
+        # Top Row: Clean 5-Column Core Match Metric Layout
+        m_col1, m_col2, m_col3, m_col4, m_col5 = st.columns(5)
         with m_col1:
             st.metric(label="🏆 PREDICTED SCORE", value=predicted_score)
         with m_col2:
-            st.metric(label="⚽ TOTAL GOALS", value=f"{exp_home_goals + exp_away_goals:.2f}")
+            st.metric(label="🚩 TOTAL CORNERS", value=f"{exp_total_corners:.1f}")
         with m_col3:
-            st.metric(label="🚩 EXPECTED CORNERS", value=f"{exp_total_corners:.1f}")
+            st.metric(label="🟨 TOTAL CARDS", value=f"{exp_total_cards:.1f}")
         with m_col4:
-            st.metric(label="🟨 EXPECTED CARDS", value=f"{exp_total_cards:.1f}")
+            st.metric(label="🤝 BTTS OUTCOME", value=f"{btts_status} ({btts_prob*100:.1f}%)")
+        with m_col5:
+            st.metric(label="📈 MAIN O/U LINE", value=main_ou_display)
+            
+        st.markdown("---")
+        
+        # Bottom Layout Splits: Team Breakdown vs Detailed Betting Line Matrix
+        b_col1, b_col2 = st.columns([1, 1])
+        
+        with b_col1:
+            st.markdown("### 👥 Team-by-Team Distribution")
+            stat_col1, stat_col2 = st.columns(2)
+            with stat_col1:
+                st.metric(label=f"🚩 {home_team} Corners", value=f"{home_corners_avg:.1f}")
+                st.metric(label=f"🟨 {home_team} Cards", value=f"{home_cards_avg:.1f}")
+            with stat_col2:
+                st.metric(label=f"🚩 {away_team} Corners", value=f"{away_corners_avg:.1f}")
+                st.metric(label=f"🟨 {away_team} Cards", value=f"{away_cards_avg:.1f}")
+                
+        with b_col2:
+            st.markdown("### 🎲 Goals Over / Under Probability Matrix")
+            ou_data = {
+                "Goal Line Market": ["1.5 Goals", "2.5 Goals", "3.5 Goals"],
+                "OVER Probability": [f"{prob_over_1_5*100:.1f}%", f"{prob_over_2_5*100:.1f}%", f"{prob_over_3_5*100:.1f}%"],
+                "UNDER Probability": [f"{prob_under_1_5*100:.1f}%", f"{prob_under_2_5*100:.1f}%", f"{prob_under_3_5*100:.1f}%"]
+            }
+            st.table(pd.DataFrame(ou_data))
