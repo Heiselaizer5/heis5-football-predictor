@@ -146,18 +146,18 @@ if df_league is not None:
         away_poisson = [np.exp(-exp_away_goals) * (exp_away_goals**j) / math.factorial(j) for j in range(max_g)]
         score_matrix = np.outer(home_poisson, away_poisson)
         
-        # -------------------------------------------------------------------------
-        # 6. GRAPHICAL DASHBOARD DISPLAY
+       # -------------------------------------------------------------------------
+        # 6. GRAPHICAL DASHBOARD DISPLAY (Using Native Streamlit Metrics)
         # -------------------------------------------------------------------------
         st.markdown("---")
-        st.markdown('<div class="section-header">📊 Analytical Projections Matrix</div>', unsafe_allow_html=True)
+        st.subheader("📊 Analytical Projections Matrix")
         
         m_col1, m_col2, m_col3, m_col4 = st.columns(4)
         with m_col1:
-            st.markdown('<div class="metric-box"><p style="margin:0; font-size:14px; color:#6B7280; font-weight:bold;">🏆 PREDICTED SCORE</p><p style="margin:5px 0 0 0; font-size:28px; color:#1E3A8A; font-weight:bold;">' + str(predicted_score) + '</p></div>', unsafe_allow_html=True)
+            st.metric(label="🏆 PREDICTED SCORE", value=predicted_score)
         with m_col2:
-            st.markdown('<div class="metric-box"><p style="margin:0; font-size:14px; color:#6B7280; font-weight:bold;">⚽ TOTAL GOALS</p><p style="margin:5px 0 0 0; font-size:28px; color:#10B981; font-weight:bold;">' + f"{exp_home_goals + exp_away_goals:.2f}" + '</p></div>', unsafe_allow_html=True)
+            st.metric(label="⚽ TOTAL GOALS", value=f"{exp_home_goals + exp_away_goals:.2f}")
         with m_col3:
-            st.markdown('<div class="metric-box"><p style="margin:0; font-size:14px; color:#6B7280; font-weight:bold;">🚩 EXPECTED CORNERS</p><p style="margin:5px 0 0 0; font-size:28px; color:#F59E0B; font-weight:bold;">' + f"{exp_total_corners:.1f}" + '</p></div>', unsafe_allow_html=True)
+            st.metric(label="🚩 EXPECTED CORNERS", value=f"{exp_total_corners:.1f}")
         with m_col4:
-            st.markdown('<div class="metric-box"><p style="margin:0; font-size:14px; color:#6B7280; font-weight:bold;">🟨 EXPECTED CARDS</p><p style="margin:5px 0 0 0; font-size:28px; color:#EF4444; font-weight:bold;">' + f"{exp_total_cards:.1f}" + '</p></div>', unsafe_allow_html=True)
+            st.metric(label="🟨 EXPECTED CARDS", value=f"{exp_total_cards:.1f}")
