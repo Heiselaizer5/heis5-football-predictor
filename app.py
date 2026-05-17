@@ -42,9 +42,9 @@ LEAGUE_MAP = {
 API_KEY = "90f1333a79ec156e426803bf6c997d23" 
 
 # -------------------------------------------------------------------------
-# 3. LIVE DATA FETCHING & DATAFRAME GENERATION
+# 3. LIVE DATA FETCHING & DATAFRAME GENERATION (DEBUGGING VERSION)
 # -------------------------------------------------------------------------
-@st.cache_data(ttl=86400)  # Caches data for 24 hours (Only 1 request per league per day!)
+@st.cache_data(ttl=3600)  
 def load_live_league_data(league_id, season):
     url = "https://v3.football.api-sports.io/standings"
     headers = {
@@ -57,21 +57,20 @@ def load_live_league_data(league_id, season):
         response = requests.get(url, headers=headers, params=params)
         data = response.json()
         
-        # Parse the JSON response into our standard structure
+        # Check if the API sent an error message back
+        if "errors" in data and data["errors"]:
+            st.error(f"❌ API Server Error Response: {data['errors']}")
+            return None
+            
         standings = data['response'][0]['league']['standings'][0]
         
         team_data = []
         for team in standings:
-            # Cards data isn't always natively in standings, so we approximate/calculate
-            # historical averages or defaults if the API doesn't bundle them in the core table.
-            # To preserve your system, we establish card baselines calculated live.
             team_name = team['team']['name']
             played = team['all']['played']
             goals_for = team['all']['goals']['for']
             goals_against = team['all']['goals']['against']
             
-            # API Standings give standard metrics; we fallback safely if specific details vary per league
-            # Simulating corners won based on attack performance, cards based on defensive records
             corners_simulated = int(goals_for * 2.5 + played * 2) 
             cards_simulated = int(goals_against * 1.2 + played * 1.5)
 
@@ -86,7 +85,7 @@ def load_live_league_data(league_id, season):
             
         return pd.DataFrame(team_data)
     except Exception as e:
-        st.error("Error fetching live data from API-Football. Make sure your API Key is correct.")
+        st.error(f"❌ Python Connection Error: {str(e)}")
         return None
 
 # -------------------------------------------------------------------------
