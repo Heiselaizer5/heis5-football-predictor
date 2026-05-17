@@ -15,10 +15,9 @@ st.markdown("""
     .metric-box { padding: 15px; background-color: #F3F4F6; border-radius: 8px; text-align: center; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
     .vs-text { font-size: 28px; font-weight: bold; text-align: center; margin-top: 35px; color: #4B5563; }
     </style>
-""", unsafe_content_html=True)
+""", unsafe_allow_html=True)  # <-- Fixed this parameter right here!
 
-st.markdown('<div class="main-header">⚽ HEIS5 Live Multi-League Match Predictor</div>', unsafe_content_html=True)
-
+st.markdown('<div class="main-header">⚽ HEIS5 Live Multi-League Match Predictor</div>', unsafe_allow_html=True) # <-- Fixed here too!
 # -------------------------------------------------------------------------
 # 2. LIVE LEAGUE REGISTRY MAPPING (API-Football IDs)
 # -------------------------------------------------------------------------
