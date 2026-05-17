@@ -157,17 +157,31 @@ if df_league is not None:
         away_poisson = [np.exp(-exp_away_goals) * (exp_away_goals**j) / math.factorial(j) for j in range(max_g)]
         score_matrix = np.outer(home_poisson, away_poisson)
         
-        best_score_idx = np.unravel_index(np.argmax(score_matrix), score_matrix.shape)
-        predicted_score = f"{best_score_idx[0]} - {best_score_idx[1]}"
-        
-        # BTTS Calculation
+        # 1. Calculate BTTS Probability first across the raw matrix
         btts_prob = 0.0
         for i in range(1, max_g):
             for j in range(1, max_g):
                 btts_prob += score_matrix[i, j]
         btts_status = "YES" if btts_prob >= 0.50 else "NO"
         
-        # Over / Under Goals Matrix calculations
+        # 2. Force the Score Matrix to adapt to the BTTS outcome
+        aligned_matrix = score_matrix.copy()
+        for i in range(max_g):
+            for j in range(max_g):
+                both_teams_scored = (i > 0 and j > 0)
+                
+                # If BTTS is YES, ignore any score containing a 0
+                if btts_status == "YES" and not both_teams_scored:
+                    aligned_matrix[i, j] = -1
+                # If BTTS is NO, ignore any score where both teams score
+                elif btts_status == "NO" and both_teams_scored:
+                    aligned_matrix[i, j] = -1
+        
+        # 3. Pick the absolute highest peak score from our filtered matrix
+        best_score_idx = np.unravel_index(np.argmax(aligned_matrix), aligned_matrix.shape)
+        predicted_score = f"{best_score_idx[0]} - {best_score_idx[1]}"
+        
+        # --- OVER/UNDER GOALS MATRIX CALCULATIONS ---
         prob_under_1_5 = 0.0
         prob_under_2_5 = 0.0
         prob_under_3_5 = 0.0
@@ -186,7 +200,6 @@ if df_league is not None:
         prob_over_2_5 = 1.0 - prob_under_2_5
         prob_over_3_5 = 1.0 - prob_under_3_5
 
-        # Clean Short Main Goal Line Formatting without long trailing text
         if total_exp_goals >= 2.5:
             main_ou_display = "Over 2.5"
         elif total_exp_goals <= 2.0:
@@ -202,7 +215,6 @@ if df_league is not None:
         st.markdown("---")
         st.subheader("📊 Analytical Projections Matrix")
         
-        # Top Row: Clean 5-Column Core Match Metric Layout
         m_col1, m_col2, m_col3, m_col4, m_col5 = st.columns(5)
         with m_col1:
             st.metric(label="🏆 PREDICTED SCORE", value=predicted_score)
@@ -217,9 +229,7 @@ if df_league is not None:
             
         st.markdown("---")
         
-        # Bottom Layout Splits: Team Breakdown vs Detailed Betting Line Matrix
         b_col1, b_col2 = st.columns([1, 1])
-        
         with b_col1:
             st.markdown("### 👥 Team-by-Team Distribution")
             stat_col1, stat_col2 = st.columns(2)
