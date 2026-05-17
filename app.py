@@ -126,12 +126,20 @@ if df_league is not None:
         away_corners_avg = away_stats['corners_won'] / away_stats['matches_played']
         exp_total_corners = home_corners_avg + away_corners_avg
         
+        # Format corners to a clean .5 line (e.g., 10.5)
+        base_corners = math.floor(exp_total_corners)
+        formatted_corners_line = f"Over {base_corners}.5" if (exp_total_corners - base_corners) >= 0.5 else f"Under {base_corners}.5"
+        
         # --- CARDS PROJECTIONS ---
         home_cards_avg = home_stats['cards_received'] / home_stats['matches_played']
         away_cards_avg = away_stats['cards_received'] / away_stats['matches_played']
         exp_total_cards = home_cards_avg + away_cards_avg
         
-        # --- SCORE MATRIX, BTTS, & OVER/UNDER MATH ---
+        # Format cards to a clean .5 line (e.g., 4.5)
+        base_cards = math.floor(exp_total_cards)
+        formatted_cards_line = f"Over {base_cards}.5" if (exp_total_cards - base_cards) >= 0.5 else f"Under {base_cards}.5"
+        
+        # --- SCORE MATRIX & SYSTEM PROBABILITIES ---
         max_g = 6
         home_poisson = [np.exp(-exp_home_goals) * (exp_home_goals**i) / math.factorial(i) for i in range(max_g)]
         away_poisson = [np.exp(-exp_away_goals) * (exp_away_goals**j) / math.factorial(j) for j in range(max_g)]
@@ -140,14 +148,14 @@ if df_league is not None:
         best_score_idx = np.unravel_index(np.argmax(score_matrix), score_matrix.shape)
         predicted_score = f"{best_score_idx[0]} - {best_score_idx[1]}"
         
-        # BTTS Logic
+        # BTTS Calculation
         btts_prob = 0.0
         for i in range(1, max_g):
             for j in range(1, max_g):
                 btts_prob += score_matrix[i, j]
         btts_status = "YES" if btts_prob >= 0.50 else "NO"
         
-        # Over / Under Logic calculation across the whole matrix
+        # Over / Under Goals Matrix calculations
         prob_under_1_5 = 0.0
         prob_under_2_5 = 0.0
         prob_under_3_5 = 0.0
@@ -166,7 +174,6 @@ if df_league is not None:
         prob_over_2_5 = 1.0 - prob_under_2_5
         prob_over_3_5 = 1.0 - prob_under_3_5
 
-        # Determine best fit main market choice for the metric indicator box
         if total_exp_goals >= 2.5:
             main_ou_display = f"OVER 2.5 ({prob_over_2_5*100:.1f}%)"
         else:
@@ -183,13 +190,13 @@ if df_league is not None:
         with m_col1:
             st.metric(label="🏆 PREDICTED SCORE", value=predicted_score)
         with m_col2:
-            st.metric(label="🚩 TOTAL CORNERS", value=f"{exp_total_corners:.1f}")
+            st.metric(label="🚩 TOTAL CORNERS", value=formatted_corners_line)
         with m_col3:
-            st.metric(label="🟨 TOTAL CARDS", value=f"{exp_total_cards:.1f}")
+            st.metric(label="🟨 TOTAL CARDS", value=formatted_cards_line)
         with m_col4:
-            st.metric(label="🤝 BTTS OUTCOME", value=f"{btts_status} ({btts_prob*100:.1f}%)")
+            st.metric(label="🤝 BTTS OUTCOME", value=btts_status)
         with m_col5:
-            st.metric(label="📈 MAIN O/U LINE", value=main_ou_display)
+            st.metric(label="📈 MAIN GOAL LINE", value=main_ou_display)
             
         st.markdown("---")
         
