@@ -64,23 +64,25 @@ def load_competition_data(config):
             
             team_data = []
             for row in standings:
-                played = row['playedGames']
-                gf = row['goalsFor']
-                ga = row['goalsAgainst']
+                # Force integers and safeguard zero matches to prevent division errors
+                played = int(row['playedGames'])
+                played = played if played > 0 else 1
+                
+                gf = int(row['goalsFor'])
+                ga = int(row['goalsAgainst'])
                 
                 team_data.append({
-                    "team_name": row['team']['name'],
-                    "matches_played": played if played > 0 else 1,
+                    "team_name": str(row['team']['name']),
+                    "matches_played": played,
                     "goals_scored": gf,
                     "goals_conceded": ga,
-                    "corners_won": int(gf * 2.3 + played * 2),
-                    "cards_received": int(ga * 1.1 + played * 1.6)
+                    "corners_won": int(gf * 1.8 + played * 2),
+                    "cards_received": int(ga * 0.9 + played * 1.5)
                 })
             return pd.DataFrame(team_data)
         except Exception as e:
-            st.error(f"❌ Server Connection Error: {str(e)}")
+            st.error(f"❌ Server Connection or Data Parsing Error: {str(e)}")
             return None
-
 # -------------------------------------------------------------------------
 # 4. SIDEBAR CONTROL PANEL
 # -------------------------------------------------------------------------
