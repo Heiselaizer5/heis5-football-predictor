@@ -127,7 +127,7 @@ if df_league is not None:
         away_corners_avg = away_stats['corners_won'] / away_stats['matches_played']
         exp_total_corners = home_corners_avg + away_corners_avg
         
-        # Total Match Corners Formatting (.5 Line)
+        # Total Match Corners Formatting
         base_match_corners = math.floor(exp_total_corners)
         formatted_match_corners = f"Over {base_match_corners}.5" if (exp_total_corners - base_match_corners) >= 0.5 else f"Under {base_match_corners}.5"
         
@@ -142,7 +142,7 @@ if df_league is not None:
         away_cards_avg = away_stats['cards_received'] / away_stats['matches_played']
         exp_total_cards = home_cards_avg + away_cards_avg
         
-        # Total Match Cards Formatting (.5 Line)
+        # Total Match Cards Formatting
         base_match_cards = math.floor(exp_total_cards)
         formatted_match_cards = f"Over {base_match_cards}.5" if (exp_total_cards - base_match_cards) >= 0.5 else f"Under {base_match_cards}.5"
         
@@ -158,29 +158,17 @@ if df_league is not None:
         away_poisson = [np.exp(-exp_away_goals) * (exp_away_goals**j) / math.factorial(j) for j in range(max_g)]
         score_matrix = np.outer(home_poisson, away_poisson)
         
-        # 1. Calculate BTTS Probability first across the raw matrix
-        btts_prob = 0.0
-        for i in range(1, max_g):
-            for j in range(1, max_g):
-                btts_prob += score_matrix[i, j]
-        btts_status = "YES" if btts_prob >= 0.50 else "NO"
-        
-        # 2. Force the Score Matrix to adapt to the BTTS outcome
-        aligned_matrix = score_matrix.copy()
-        for i in range(max_g):
-            for j in range(max_g):
-                both_teams_scored = (i > 0 and j > 0)
-                
-                if btts_status == "YES" and not both_teams_scored:
-                    aligned_matrix[i, j] = -1
-                elif btts_status == "NO" and both_teams_scored:
-                    aligned_matrix[i, j] = -1
-        
-        # 3. Pick the final predicted score line from filtered options
-        best_score_idx = np.unravel_index(np.argmax(aligned_matrix), aligned_matrix.shape)
+        # 1. Find the raw peak score from the matrix first
+        best_score_idx = np.unravel_index(np.argmax(score_matrix), score_matrix.shape)
         predicted_score = f"{best_score_idx[0]} - {best_score_idx[1]}"
         
-        # 4. Main Goal Line depends directly on the final Predicted Score
+        # 2. BTTS Outcome depends completely on the Predicted Score
+        if best_score_idx[0] > 0 and best_score_idx[1] > 0:
+            btts_status = "YES"
+        else:
+            btts_status = "NO"
+        
+        # 3. Main Goal Line depends completely on the Predicted Score
         predicted_total_goals = best_score_idx[0] + best_score_idx[1]
         if predicted_total_goals >= 3:
             main_ou_display = "Over 2.5"
@@ -189,7 +177,7 @@ if df_league is not None:
         else:
             main_ou_display = f"Under {predicted_total_goals + 0.5}"
         
-        # --- OVER/UNDER GOALS MATRIX CALCULATIONS ---
+        # --- OVER/UNDER GOALS MATRIX CALCULATIONS (For the detailed table below) ---
         prob_under_1_5 = 0.0
         prob_under_2_5 = 0.0
         prob_under_3_5 = 0.0
