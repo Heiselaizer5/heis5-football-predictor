@@ -9,7 +9,7 @@ import math
 # -------------------------------------------------------------------------
 st.set_page_config(page_title="HEIS5 Multi-Source Predictor", page_icon="⚽", layout="wide")
 
-st.title("⚽ HEIS5 Live & Tournament Match Predictor")
+st.title("⚽ Welcome to HEIS5 Match Predictor")
 
 # -------------------------------------------------------------------------
 # 2. COMPETITION REGISTRY MAPPING (Hybrid Setup)
@@ -126,18 +126,30 @@ if df_league is not None:
         away_corners_avg = away_stats['corners_won'] / away_stats['matches_played']
         exp_total_corners = home_corners_avg + away_corners_avg
         
-        # Format corners to a clean .5 line (e.g., 10.5)
-        base_corners = math.floor(exp_total_corners)
-        formatted_corners_line = f"Over {base_corners}.5" if (exp_total_corners - base_corners) >= 0.5 else f"Under {base_corners}.5"
+        # Total Match Corners Formatting
+        base_match_corners = math.floor(exp_total_corners)
+        formatted_match_corners = f"Over {base_match_corners}.5" if (exp_total_corners - base_match_corners) >= 0.5 else f"Under {base_match_corners}.5"
+        
+        # Individual Team Corners Formatting
+        base_home_corners = math.floor(home_corners_avg)
+        formatted_home_corners = f"Over {base_home_corners}.5" if (home_corners_avg - base_home_corners) >= 0.5 else f"Under {base_home_corners}.5"
+        base_away_corners = math.floor(away_corners_avg)
+        formatted_away_corners = f"Over {base_away_corners}.5" if (away_corners_avg - base_away_corners) >= 0.5 else f"Under {base_away_corners}.5"
         
         # --- CARDS PROJECTIONS ---
         home_cards_avg = home_stats['cards_received'] / home_stats['matches_played']
         away_cards_avg = away_stats['cards_received'] / away_stats['matches_played']
         exp_total_cards = home_cards_avg + away_cards_avg
         
-        # Format cards to a clean .5 line (e.g., 4.5)
-        base_cards = math.floor(exp_total_cards)
-        formatted_cards_line = f"Over {base_cards}.5" if (exp_total_cards - base_cards) >= 0.5 else f"Under {base_cards}.5"
+        # Total Match Cards Formatting
+        base_match_cards = math.floor(exp_total_cards)
+        formatted_match_cards = f"Over {base_match_cards}.5" if (exp_total_cards - base_match_cards) >= 0.5 else f"Under {base_match_cards}.5"
+        
+        # Individual Team Cards Formatting
+        base_home_cards = math.floor(home_cards_avg)
+        formatted_home_cards = f"Over {base_home_cards}.5" if (home_cards_avg - base_home_cards) >= 0.5 else f"Under {base_home_cards}.5"
+        base_away_cards = math.floor(away_cards_avg)
+        formatted_away_cards = f"Over {base_away_cards}.5" if (away_cards_avg - base_away_cards) >= 0.5 else f"Under {base_away_cards}.5"
         
         # --- SCORE MATRIX & SYSTEM PROBABILITIES ---
         max_g = 6
@@ -148,7 +160,7 @@ if df_league is not None:
         best_score_idx = np.unravel_index(np.argmax(score_matrix), score_matrix.shape)
         predicted_score = f"{best_score_idx[0]} - {best_score_idx[1]}"
         
-        # BTTS Calculation
+        # BTTS Calculation (Clean status string, no percentages)
         btts_prob = 0.0
         for i in range(1, max_g):
             for j in range(1, max_g):
@@ -190,9 +202,9 @@ if df_league is not None:
         with m_col1:
             st.metric(label="🏆 PREDICTED SCORE", value=predicted_score)
         with m_col2:
-            st.metric(label="🚩 TOTAL CORNERS", value=formatted_corners_line)
+            st.metric(label="🚩 TOTAL CORNERS", value=formatted_match_corners)
         with m_col3:
-            st.metric(label="🟨 TOTAL CARDS", value=formatted_cards_line)
+            st.metric(label="🟨 TOTAL CARDS", value=formatted_match_cards)
         with m_col4:
             st.metric(label="🤝 BTTS OUTCOME", value=btts_status)
         with m_col5:
@@ -207,11 +219,11 @@ if df_league is not None:
             st.markdown("### 👥 Team-by-Team Distribution")
             stat_col1, stat_col2 = st.columns(2)
             with stat_col1:
-                st.metric(label=f"🚩 {home_team} Corners", value=f"{home_corners_avg:.1f}")
-                st.metric(label=f"🟨 {home_team} Cards", value=f"{home_cards_avg:.1f}")
+                st.metric(label=f"🚩 {home_team} Corners", value=formatted_home_corners)
+                st.metric(label=f"🟨 {home_team} Cards", value=formatted_home_cards)
             with stat_col2:
-                st.metric(label=f"🚩 {away_team} Corners", value=f"{away_corners_avg:.1f}")
-                st.metric(label=f"🟨 {away_team} Cards", value=f"{away_cards_avg:.1f}")
+                st.metric(label=f"🚩 {away_team} Corners", value=formatted_away_corners)
+                st.metric(label=f"🟨 {away_team} Cards", value=formatted_away_cards)
                 
         with b_col2:
             st.markdown("### 🎲 Goals Over / Under Probability Matrix")
