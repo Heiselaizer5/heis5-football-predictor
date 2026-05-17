@@ -126,7 +126,7 @@ if df_league is not None:
         away_corners_avg = away_stats['corners_won'] / away_stats['matches_played']
         exp_total_corners = home_corners_avg + away_corners_avg
         
-        # Total Match Corners Formatting
+        # Total Match Corners Formatting (.5 Line)
         base_match_corners = math.floor(exp_total_corners)
         formatted_match_corners = f"Over {base_match_corners}.5" if (exp_total_corners - base_match_corners) >= 0.5 else f"Under {base_match_corners}.5"
         
@@ -141,7 +141,7 @@ if df_league is not None:
         away_cards_avg = away_stats['cards_received'] / away_stats['matches_played']
         exp_total_cards = home_cards_avg + away_cards_avg
         
-        # Total Match Cards Formatting
+        # Total Match Cards Formatting (.5 Line)
         base_match_cards = math.floor(exp_total_cards)
         formatted_match_cards = f"Over {base_match_cards}.5" if (exp_total_cards - base_match_cards) >= 0.5 else f"Under {base_match_cards}.5"
         
@@ -170,16 +170,23 @@ if df_league is not None:
             for j in range(max_g):
                 both_teams_scored = (i > 0 and j > 0)
                 
-                # If BTTS is YES, ignore any score containing a 0
                 if btts_status == "YES" and not both_teams_scored:
                     aligned_matrix[i, j] = -1
-                # If BTTS is NO, ignore any score where both teams score
                 elif btts_status == "NO" and both_teams_scored:
                     aligned_matrix[i, j] = -1
         
-        # 3. Pick the absolute highest peak score from our filtered matrix
+        # 3. Pick the final predicted score line from filtered options
         best_score_idx = np.unravel_index(np.argmax(aligned_matrix), aligned_matrix.shape)
         predicted_score = f"{best_score_idx[0]} - {best_score_idx[1]}"
+        
+        # 4. Main Goal Line depends directly on the final Predicted Score
+        predicted_total_goals = best_score_idx[0] + best_score_idx[1]
+        if predicted_total_goals >= 3:
+            main_ou_display = "Over 2.5"
+        elif predicted_total_goals == 2:
+            main_ou_display = "Under 2.5"
+        else:
+            main_ou_display = f"Under {predicted_total_goals + 0.5}"
         
         # --- OVER/UNDER GOALS MATRIX CALCULATIONS ---
         prob_under_1_5 = 0.0
@@ -199,15 +206,6 @@ if df_league is not None:
         prob_over_1_5 = 1.0 - prob_under_1_5
         prob_over_2_5 = 1.0 - prob_under_2_5
         prob_over_3_5 = 1.0 - prob_under_3_5
-
-        if total_exp_goals >= 2.5:
-            main_ou_display = "Over 2.5"
-        elif total_exp_goals <= 2.0:
-            main_ou_display = "Under 2"
-        elif total_exp_goals > 2.0 and total_exp_goals < 2.5:
-            main_ou_display = "Under 2.5"
-        else:
-            main_ou_display = "Over 2"
 
         # -------------------------------------------------------------------------
         # 6. GRAPHICAL DASHBOARD DISPLAY
