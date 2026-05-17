@@ -21,6 +21,7 @@ LEAGUE_MAP = {
     "German Bundesliga 🇩🇪": {"type": "api", "code": "BL1"},
     "French Ligue 1 🇫🇷": {"type": "api", "code": "FL1"},
     "Portuguese Primeira Liga 🇵🇹": {"type": "api", "code": "PPL"},
+    "Italian Serie A 🇮🇹": {"type": "api", "code": "SA"},
     
     # Local CSV Datasets (Stored in your GitHub Repo)
     "FIFA World Cup 2026 🏆": {"type": "csv", "file": "world_cup.csv"},
