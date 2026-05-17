@@ -160,7 +160,7 @@ if df_league is not None:
         best_score_idx = np.unravel_index(np.argmax(score_matrix), score_matrix.shape)
         predicted_score = f"{best_score_idx[0]} - {best_score_idx[1]}"
         
-        # BTTS Calculation (Clean status string, no percentages)
+        # BTTS Calculation
         btts_prob = 0.0
         for i in range(1, max_g):
             for j in range(1, max_g):
@@ -186,10 +186,15 @@ if df_league is not None:
         prob_over_2_5 = 1.0 - prob_under_2_5
         prob_over_3_5 = 1.0 - prob_under_3_5
 
+        # Clean Short Main Goal Line Formatting without long trailing text
         if total_exp_goals >= 2.5:
-            main_ou_display = f"OVER 2.5 ({prob_over_2_5*100:.1f}%)"
+            main_ou_display = "Over 2.5"
+        elif total_exp_goals <= 2.0:
+            main_ou_display = "Under 2"
+        elif total_exp_goals > 2.0 and total_exp_goals < 2.5:
+            main_ou_display = "Under 2.5"
         else:
-            main_ou_display = f"UNDER 2.5 ({prob_under_2_5*100:.1f}%)"
+            main_ou_display = "Over 2"
 
         # -------------------------------------------------------------------------
         # 6. GRAPHICAL DASHBOARD DISPLAY
