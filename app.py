@@ -106,7 +106,7 @@ API_TOKEN = "90f1333a79ec156e426803bf6c997d23"
 
 @st.cache_data(ttl=3600)
 def fetch_league_teams_and_stats(league_code, token):
-    if not token or token == "YOUR_ACTUAL_FOOTBALL_DATA_API_KEY":
+    if not token or token == "90f1333a79ec156e426803bf6c997d23":
         return {}
     
     headers = {"X-Auth-Token": token}
@@ -239,9 +239,9 @@ else:
         st.info("### 🔓 Sehemu ya Kupata Utabiri wa Hali ya Juu / Where You Get Premium-Level Predictions")
         st.write("You can pay easily using **Tigo Pesa, M-Pesa, or Airtel Money** (No bank card needed!). Choose your access pass below:")
         
-        st.markdown("[📋 Purchase 1-Week Pass / Lipia Wiki 1 (2,000 TZS)](https://selar.co/0xt51n9m6q?currency=TZS)")
-        st.markdown("[📅 Purchase 1-Month Pass / Lipia Mwezi 1 (5,000 TZS)](https://selar.co/3195d901k1?currency=TZS)")
-        st.markdown("[🏆 Purchase 3-Month Pass / Lipia Miezi 3 (12,000 TZS)](https://selar.co/o9n50311b0?currency=TZS)")
+        st.markdown("[📋 Purchase 1-Week Pass / Lipia Wiki 1 (5,000 TZS)](https://selar.co/0xt51n9m6q?currency=TZS)")
+        st.markdown("[📅 Purchase 1-Month Pass / Lipia Mwezi 1 (15,000 TZS)](https://selar.co/3195d901k1?currency=TZS)")
+        st.markdown("[🏆 Purchase 3-Month Pass / Lipia Miezi 3 (45,000 TZS)](https://selar.co/o9n50311b0?currency=TZS)")
         st.stop()
 
     # -------------------------------------------------------------------------
