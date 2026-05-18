@@ -211,8 +211,8 @@ else:
         st.session_state.current_user = ""
         st.rerun()
 
-    # -------------------------------------------------------------------------
-    # 2. MULTI-TIER PREMIUM PAYWALL CONTROLLER (100% SECURE)
+   # -------------------------------------------------------------------------
+    # 2. MULTI-TIER PREMIUM PAYWALL CONTROLLER (100% SECURE & FIXED)
     # -------------------------------------------------------------------------
     st.sidebar.markdown("---")
     st.sidebar.header("🔑 HEIS5 Premium Access")
@@ -223,23 +223,28 @@ else:
 
     user_token = st.sidebar.text_input("Enter Premium Token:", type="password")
     
+    # 🔒 Cryptographic check for Admin password: Erasto_HEIS5_Boss_2026
     input_hash = hashlib.sha256(user_token.encode()).hexdigest()
     ADMIN_HASH = "6cf87d46ffb8cbdf9c6e3b0bc8fa66bb897bf4e5d666495b5420362b5d438ba6"
+    
     is_admin = (input_hash == ADMIN_HASH)
 
-    is_premium = user_token in WEEK_TOKENS or user_token in MONTH_TOKENS or user_token in THREE_MONTH_TOKENS or is_admin
-
+    # 👑 Master Override: If you are the admin, you are automatically premium!
     if is_admin:
+        is_premium = True
         st.sidebar.success("⚡ Admin Verified / Mmiliki Umethibitishwa!")
+    else:
+        is_premium = user_token in WEEK_TOKENS or user_token in MONTH_TOKENS or user_token in THREE_MONTH_TOKENS
 
+    # If they aren't premium and aren't admin, block them
     if not is_premium:
         st.sidebar.error("🔒 Premium Required / Kifurushi Kinahitajika")
         st.info("### 🔓 Sehemu ya Kupata Utabiri wa Hali ya Juu / Where You Get Premium-Level Predictions")
         st.write("You can pay easily using **Tigo Pesa, M-Pesa, or Airtel Money** (No bank card needed!). Choose your access pass below:")
         
-        st.markdown("[📋 Purchase 1-Week Pass / Lipia Wiki 1 (2,000 TZS)](https://selar.co/0xt51n9m6q?currency=TZS)")
-        st.markdown("[📅 Purchase 1-Month Pass / Lipia Mwezi 1 (5,000 TZS)](https://selar.co/3195d901k1?currency=TZS)")
-        st.markdown("[🏆 Purchase 3-Month Pass / Lipia Miezi 3 (12,000 TZS)](https://selar.co/o9n50311b0?currency=TZS)")
+        st.markdown("[📋 Purchase 1-Week Pass / Lipia Wiki 1 (5,000 TZS)](https://selar.co/0xt51n9m6q?currency=TZS)")
+        st.markdown("[📅 Purchase 1-Month Pass / Lipia Mwezi 1 (15,000 TZS)](https://selar.co/3195d901k1?currency=TZS)")
+        st.markdown("[🏆 Purchase 3-Month Pass / Lipia Miezi 3 (45,000 TZS)](https://selar.co/o9n50311b0?currency=TZS)")
         st.stop()
 
     # -------------------------------------------------------------------------
