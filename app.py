@@ -101,18 +101,32 @@ API_LEAGUES = {
     "FIFA World Cup 🏆": "WC"
 }
 # 🔒 Hardcode your real football-data.org token string here inside the quotes:
-API_TOKEN = " d7bf2e7e47344436b3571ff11c6639c6"
-
+API_TOKEN = "d7bf2e7e47344436b3571ff11c6639c6"
 @st.cache_data(ttl=3600)
 def fetch_league_teams_and_stats(league_code, token):
     if not token or token == "YOUR_ACTUAL_FOOTBALL_DATA_API_KEY":
         return {}
     
-    headers = {"X-Auth-Token": token}
+    headers = {
+        "X-Auth-Token": token,
+        "X-Response-Control": "minified"
+    }
     try:
         url = f"https://api.football-data.org/v4/competitions/{league_code}/standings"
         response = requests.get(url, headers=headers)
-        if response.status_code != 200:
+        
+        # 🚨 DEBUG SYSTEM: If their server rejects us, show the exact reason!
+        if response.status_code == 429:
+            st.error("⚠️ API Error 429: You have hit the 10-requests-per-minute limit! Wait 1 minute and refresh.")
+            return None
+        elif response.status_code == 403:
+            st.error("⚠️ API Error 403: Restricted League! ")
+            return None
+        elif response.status_code == 400 or response.status_code == 401:
+            st.error("⚠️ API Error 401: Invalid Token! Check your email to make sure the key is correct and activated.")
+            return None
+        elif response.status_code != 200:
+            st.error(f"⚠️ API Error {response.status_code}: Server issue ")
             return None
             
         data = response.json()
@@ -137,7 +151,8 @@ def fetch_league_teams_and_stats(league_code, token):
                 processed_teams[team_name] = [avg_scored, avg_conceded, 5.5, 1.8]
             
         return processed_teams
-    except:
+    except Exception as e:
+        st.error(f"⚠️ Connection Error: {str(e)}")
         return None
 
 # -------------------------------------------------------------------------
