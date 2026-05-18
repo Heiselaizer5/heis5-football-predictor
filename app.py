@@ -105,7 +105,7 @@ API_TOKEN = " d7bf2e7e47344436b3571ff11c6639c6"
 
 @st.cache_data(ttl=3600)
 def fetch_league_teams_and_stats(league_code, token):
-    if not token or token == " d7bf2e7e47344436b3571ff11c6639c6":
+    if not token or token == "YOUR_ACTUAL_FOOTBALL_DATA_API_KEY":
         return {}
     
     headers = {"X-Auth-Token": token}
