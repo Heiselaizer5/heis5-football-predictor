@@ -89,8 +89,8 @@ st.markdown("""
 # FOOTBALL-DATA.ORG API SYSTEM CONFIGURATION (HARDCODED & INVISIBLE)
 # -------------------------------------------------------------------------
 API_LEAGUES = {
-    "English Premier League 🏴\u200d\u200d󠁧󠁢󠁥󠁮󠁧󠁿": "PL",
-    "English Championship 🏴\u200d\u200d󠁧󠁢󠁥󠁮󠁧󠁿": "ELC",
+    "English Premier League 🇬🇧": "PL",
+    "English Championship 🇬🇧": "ELC",
     "Italian Serie A 🇮🇹": "SA",
     "Spanish La Liga 🇪🇸": "PD",
     "German Bundesliga 🇩🇪": "BL1",
@@ -100,13 +100,12 @@ API_LEAGUES = {
     "UEFA Champions League 🇪🇺": "CL",
     "FIFA World Cup 🏆": "WC"
 }
-
 # 🔒 Hardcode your real football-data.org token string here inside the quotes:
-API_TOKEN = "90f1333a79ec156e426803bf6c997d23"
+API_TOKEN = " d7bf2e7e47344436b3571ff11c6639c6"
 
 @st.cache_data(ttl=3600)
 def fetch_league_teams_and_stats(league_code, token):
-    if not token or token == "90f1333a79ec156e426803bf6c997d23":
+    if not token or token == " d7bf2e7e47344436b3571ff11c6639c6":
         return {}
     
     headers = {"X-Auth-Token": token}
