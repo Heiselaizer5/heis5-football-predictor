@@ -167,12 +167,14 @@ else:
     WEEK_TOKENS = ["HEIS5_1WEEK_VIP", "WEEK_ACCESS_99"]
     MONTH_TOKENS = ["HEIS5_1MONTH_VIP", "MONTH_ACCESS_88"]
     THREE_MONTH_TOKENS = ["HEIS5_3MONTHS_VIP", "PREMIUM_3M_77"]
-
-    ADMIN_TOKENS = ["HEIS5_OWNER_2026", "HEIS5_ADMIN"]
+    
+    # 👑 YOUR SECRET ADMIN CODE 
+    ADMIN_TOKENS = ["HEIS5_ADMIN_2026", "ERASTO_BOSS"]
 
     user_token = st.sidebar.text_input("Enter Premium Token:", type="password")
+    
+    # This checks regular tokens OR if you typed your secret admin code!
     is_premium = user_token in WEEK_TOKENS or user_token in MONTH_TOKENS or user_token in THREE_MONTH_TOKENS or user_token in ADMIN_TOKENS
-
     trials_used = get_user_trials(st.session_state.current_user)
 
     if not is_premium:
@@ -182,16 +184,19 @@ else:
         else:
             st.sidebar.error("❌ Free Trial Expired!")
             st.info("### 🔒 Premium Access Required / Kifurushi Kinahitajika")
-            st.markdown("[📋 Purchase 1-Week Pass (5,000 TZS)](https://selar.co/0xt51n9m6q)")
-            st.markdown("[📅 Purchase 1-Month Pass (15,000 TZS)](https://selar.co/3195d901k1)")
-            st.markdown("[🏆 Purchase 3-Month Pass (45,000 TZS)](https://selar.co/o9n50311b0)")
+            st.write("You can pay easily using **M-Pesa, Tigo Pesa, or Airtel Money** (No Card Needed!). Choose your plan below:")
+            st.write("*Unaweza kulipia kwa urahisi ukitumia **M-Pesa, Tigo Pesa, au Airtel Money** bila kuhitaji kadi ya benki. Chagua kifurushi chako:*")
+
+            st.markdown("[📋 Purchase 1-Week Pass (5,000 TZS)](https://selar.co/0xt51n9m6q?currency=TZS)")
+            st.markdown("[📅 Purchase 1-Month Pass (15,000 TZS)](https://selar.co/3195d901k1?currency=TZS)")
+            st.markdown("[🏆 Purchase 3-Month Pass (45,000 TZS)](https://selar.co/o9n50311b0?currency=TZS)")
             st.stop()
 
     # -------------------------------------------------------------------------
     # 3. INTERACTION INTERFACE & API INTEGRATION ENGINE
     # -------------------------------------------------------------------------
     st.title("⚽ HEIS5 Football Predictor App")
-    st.write("The home of high-quality football predictions")
+    st.write("The Home of High-quality Football Predictions")
     st.markdown("---")
 
     selected_league_name = st.selectbox("Select League / Chagua Ligi:", list(API_LEAGUES.keys()))
