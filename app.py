@@ -105,7 +105,7 @@ API_TOKEN = "d7bf2e7e47344436b3571ff11c6639c6"
 # Change from 3600 to 60 so it refreshes quickly when you test different matchups!
 @st.cache_data(ttl=60)
 def fetch_league_teams_and_stats(league_code, token):
-    if not token or token == "d7bf2e7e47344436b3571ff11c6639c6":
+    if not token or token == "YOUR_ACTUAL_FOOTBALL_DATA_API_KEY":
         return {}
     
     headers = {
