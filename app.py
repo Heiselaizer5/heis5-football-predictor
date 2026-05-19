@@ -102,9 +102,10 @@ API_LEAGUES = {
 }
 # 🔒 Hardcode your real football-data.org token string here inside the quotes:
 API_TOKEN = "d7bf2e7e47344436b3571ff11c6639c6"
-@st.cache_data(ttl=3600)
+# Change from 3600 to 60 so it refreshes quickly when you test different matchups!
+@st.cache_data(ttl=60)
 def fetch_league_teams_and_stats(league_code, token):
-    if not token or token == "YOUR_ACTUAL_FOOTBALL_DATA_API_KEY":
+    if not token or token == "d7bf2e7e47344436b3571ff11c6639c6":
         return {}
     
     headers = {
@@ -285,7 +286,7 @@ else:
 
     st.markdown("<br>", unsafe_allow_html=True)
 
-    if st.button("🚀 Run Analytical Prediction Model / Tabiri Sasa", use_container_width=True):
+    if st.button("🚀 Run Analytical Prediction Model / Tabiri Sasa", type="primary", use_container_width=True):
         if home_team == away_team:
             st.warning("⚠️ Home Team and Away Team cannot be identical.")
             st.stop()
@@ -299,6 +300,7 @@ else:
         home_exp_goals = home_attack * away_defense
         away_exp_goals = away_attack * home_defense
         
+        # Calculate Poisson matrix
         max_goals = 6
         matrix = np.zeros((max_goals, max_goals))
         for h in range(max_goals):
@@ -311,28 +313,43 @@ else:
                 results.append(((h, a), matrix[h, a]))
         results.sort(key=lambda x: x[1], reverse=True)
 
-        prob_under_05 = matrix[0, 0]
-        goal_line_verdict = "Over 0.5 Goals" if (1.0 - prob_under_05) > prob_under_05 else "Under 0.5 Goals"
+        # 🎯 1. GET THE SINGLE HIGHEST PROBABILITY SCORE
+        top_score, top_prob = results[0]  # This is the #1 prediction
+        predicted_home_goals = top_score[0]
+        predicted_away_goals = top_score[1]
+        total_predicted_goals = predicted_home_goals + predicted_away_goals
 
-        prob_btts_yes = sum(matrix[h, a] for h in range(1, max_goals) for a in range(1, max_goals))
-        btts_verdict = "Yes" if prob_btts_yes > (1.0 - prob_btts_yes) else "No"
+        # 📊 2. GOAL LINE DEPENDS DIRECTLY ON THE TOP PREDICTED SCORE
+        if total_predicted_goals >= 3:
+            goal_line_verdict = "Over 2.5 Goals"
+        else:
+            goal_line_verdict = "Under 2.5 Goals"
 
+        # 🤝 Both Teams To Score (BTTS) depends directly on the top score too
+        if predicted_home_goals > 0 and predicted_away_goals > 0:
+            btts_verdict = "Yes"
+        else:
+            btts_verdict = "No"
+
+        # Calculate Corners and Cards lines
         exp_total_corners = home_corners_avg + away_corners_avg
         corners_line = "Over 8.5 Corners" if (1 - stats.poisson.cdf(8, exp_total_corners)) > 0.5 else "Under 8.5 Corners"
 
         exp_total_cards = home_cards_avg + away_cards_avg
         cards_line = "Over 3.5 Cards" if (1 - stats.poisson.cdf(3, exp_total_cards)) > 0.5 else "Under 3.5 Cards"
 
+        # -------------------------------------------------------------------------
+        # DISPLAY RESULTS (ONLY SHOWING 1 HIGH POSSIBLE SCORE)
+        # -------------------------------------------------------------------------
         st.markdown(f"### 📊 Predictions for {home_team} vs {away_team}")
         
-        # Displaying custom HTML designed metric containers
         c1, c2, c3 = st.columns(3)
         with c1:
             st.markdown(f"""
                 <div class="prediction-card">
                     <div class="prediction-title">Goal Line / Magoli</div>
                     <div class="prediction-value">{goal_line_verdict}</div>
-                    <div style="color:#71717a; font-size:12px; margin-top:5px;">xG: {home_exp_goals:.2f} - {away_exp_goals:.2f}</div>
+                    <div style="color:#71717a; font-size:12px; margin-top:5px;">Based on predicted score</div>
                 </div>
             """, unsafe_allow_html=True)
         with c2:
@@ -358,15 +375,15 @@ else:
         """, unsafe_allow_html=True)
 
         st.markdown("---")
-        st.subheader("🔮 Top 3 Exact Score Probabilities / Matokeo Sahihi")
-        for i in range(3):
-            score, prob = results[i]
-            st.markdown(f"""
-                <div class="score-row">
-                    <span>🎯 <b>Top {i+1} Probability</b></span>
-                    <span>{home_team} <b>{score[0]} - {score[1]}</b> {away_team}</span>
-                    <span style="color:#00ff66; font-weight:bold;">{prob*100:.1f}% Match Chance</span>
-                </div>
-            """, unsafe_allow_html=True)
+        st.subheader("🔮 Highest Possible Exact Score / Matokeo Sahihi")
+        
+        # Only rendering the single Top 1 outcome row
+        st.markdown(f"""
+            <div class="score-row" style="border-left: 6px solid #00ff66;">
+                <span>🎯 <b>HIGH CONFIDENCE PREDICTION</b></span>
+                <span style="font-size: 20px;">{home_team} <b>{predicted_home_goals} - {predicted_away_goals}</b> {away_team}</span>
+                <span style="color:#00ff66; font-weight:bold;">{top_prob*100:.1f}% Model Probability</span>
+            </div>
+        """, unsafe_allow_html=True)
 
         st.button("Reset / Angalia Tena", use_container_width=True)
