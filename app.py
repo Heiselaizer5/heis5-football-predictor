@@ -18,7 +18,7 @@ st.markdown("""
     /* Main background with player kicking a ball and a dark dark overlay for text readability */
     .stApp {
         background-image: linear-gradient(rgba(14, 17, 23, 0.85), rgba(14, 17, 23, 0.85)), 
-                          url('https://images.unsplash.com/photo-1508098682722-e99c43a406b2?q=80&w=1920&auto=format&fit=crop');
+                          url('http://googleusercontent.com/image_generation_content/0');
         background-size: cover;
         background-position: center center;
         background-repeat: no-repeat;
