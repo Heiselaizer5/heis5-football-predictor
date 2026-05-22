@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import streamlit as st
 import numpy as np
 import scipy.stats as stats
@@ -10,13 +11,18 @@ import requests
 st.set_page_config(page_title="HEIS5 Football Predictor", page_icon="⚽", layout="wide")
 
 # -------------------------------------------------------------------------
-# 🎨 CUSTOM CSS STYLING INJECTION (PREMIUM DESIGN UPGRADE)
+# 🎨 CUSTOM CSS STYLING INJECTION (PREMIUM DESIGN WITH FOOTBALL BACKGROUND)
 # -------------------------------------------------------------------------
 st.markdown("""
     <style>
-    /* Main background and font adjustments */
+    /* Main background with player kicking a ball and a dark dark overlay for text readability */
     .stApp {
-        background-color: #0e1117;
+        background-image: linear-gradient(rgba(14, 17, 23, 0.85), rgba(14, 17, 23, 0.85)), 
+                          url('https://images.unsplash.com/photo-1508098682722-e99c43a406b2?q=80&w=1920&auto=format&fit=crop');
+        background-size: cover;
+        background-position: center center;
+        background-repeat: no-repeat;
+        background-attachment: fixed;
     }
     
     /* Top title styling */
@@ -226,7 +232,7 @@ else:
         st.session_state.current_user = ""
         st.rerun()
 
-   # -------------------------------------------------------------------------
+    # -------------------------------------------------------------------------
     # 2. MULTI-TIER PREMIUM PAYWALL CONTROLLER (DIRECT ADMIN OVERRIDE)
     # -------------------------------------------------------------------------
     st.sidebar.markdown("---")
@@ -239,7 +245,6 @@ else:
     user_token = st.sidebar.text_input("Enter Premium Token:", type="password")
     
     # 👑 DIRECT ACCURATE PASSWORD CHECK
-    # We check the exact word directly to avoid any hash comparison bugs
     is_admin = (user_token == "Erasto_HEIS5_Boss_2026")
 
     if is_admin:
